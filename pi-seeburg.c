@@ -123,6 +123,7 @@ void handle_key_combo(char letter, int number) {
 	printf("Combo: %c%d\n\n", letter, number);
 }
 
+// Returns the time difference, in usec, between two provided struct timevals 
 unsigned long get_diff(struct timeval now, struct timeval last_change) {
 	return (now.tv_sec * 1000000 + now.tv_usec) - (last_change.tv_sec * 1000000 + last_change.tv_usec);
 }
