@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <sys/time.h>
 #include <wiringPi.h>
 
@@ -27,7 +28,7 @@ unsigned long get_diff(struct timeval now, struct timeval last_change);
 void handle(void);
 void handle_key_combo(char letter, int number);
 
-main(void) {
+int main(void) {
 	struct timeval now;
 	unsigned long diff;
 	char letter;
@@ -83,6 +84,8 @@ main(void) {
 		// Waste time but not CPU whilst still allowing us to detct finished pulses
 		usleep(10000);
 	}
+
+	return 0;
 }
 
 // Handler for interrupt
