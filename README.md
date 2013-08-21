@@ -1,7 +1,7 @@
 Intro
 =====
 
-Based on my [https://github.com/phil-lavin/raspberry-pi-gpio-interrupt](Raspberry Pi GPIO Interrupt demo code). Interfaces the RasPi with my
+Based on my [Raspberry Pi GPIO Interrupt demo code](https://github.com/phil-lavin/raspberry-pi-gpio-interrupt). Interfaces the RasPi with my
 1960s Seeburg Wall-O-Matic 100 to decode the pulse train into the key combination that was pressed.
 
 Interfacing with the Pi
