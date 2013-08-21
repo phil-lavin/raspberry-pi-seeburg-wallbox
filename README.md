@@ -17,7 +17,7 @@ Compiling
 
 * Clone the repository
 * Follow the instructions at http://wiringpi.com/download-and-install/ to install the WiringPi library on your Pi
-* ```gcc -lwiringPi -o gpio-interrupt gpio-interrupt.c```
+* ```gcc -lwiringPi -o pi-seeburg pi-seeburg.c```
 
 Settings
 --------
@@ -42,5 +42,5 @@ Running
 Must be run as root
 
 ```
-./gpio-interrupt
+./pi-seeburg
 ```
