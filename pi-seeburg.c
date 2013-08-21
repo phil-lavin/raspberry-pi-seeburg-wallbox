@@ -1,3 +1,11 @@
+/**
+* Code to to decode the pulses from a 1960s Seeburg Wall-O-Matic 100 into the pressed key combination
+* by Phil Lavin <phil@lavin.me.uk>.
+*
+* Released under the BSD license.
+*
+*/
+
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/time.h>
