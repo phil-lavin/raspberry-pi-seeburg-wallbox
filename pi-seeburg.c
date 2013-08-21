@@ -81,7 +81,7 @@ int main(void) {
 			gettimeofday(&last_change, NULL);
 		}
 
-		// Waste time but not CPU whilst still allowing us to detct finished pulses
+		// Waste time but not CPU whilst still allowing us to detect finished pulses
 		usleep(10000);
 	}
 
