@@ -25,7 +25,7 @@ int post_gap_pulses = 0;
 
 // Predefines
 unsigned long get_diff(struct timeval now, struct timeval last_change);
-void handle(void);
+void handle_gpio_interrupt(void);
 void handle_key_combo(char letter, int number);
 
 int main(void) {
@@ -41,7 +41,7 @@ int main(void) {
 	pinMode(PIN, OUTPUT);
 
 	// Bind to interrupt
-	wiringPiISR(PIN, INT_EDGE_BOTH, &handle);
+	wiringPiISR(PIN, INT_EDGE_BOTH, &handle_gpio_interrupt);
 
 	// The loop...
 	for (;;) {
@@ -89,7 +89,7 @@ int main(void) {
 }
 
 // Handler for interrupt
-void handle(void) {
+void handle_gpio_interrupt(void) {
 	struct timeval now;
 	unsigned long diff;
 
