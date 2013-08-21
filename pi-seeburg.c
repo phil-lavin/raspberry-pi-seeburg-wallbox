@@ -40,6 +40,9 @@ int main(void) {
 	// Set pin to output in case it's not
 	pinMode(PIN, OUTPUT);
 
+	// Init last change to be now
+	gettimeofday(&last_change, NULL);
+
 	// Bind to interrupt
 	wiringPiISR(PIN, INT_EDGE_BOTH, &handle_gpio_interrupt);
 
