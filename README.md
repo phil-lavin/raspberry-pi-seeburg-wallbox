@@ -10,7 +10,9 @@ Interfacing with the Pi
 The wallbox works on 25V AC. A simple circuit was used to pass pulses at this voltage to the GPIO pins of the RasPi at the RasPi's required
 small current (around 2mA) @ 3.3V DC.
 
-Circuit diagram to come later...
+Diagram is as follows:
+
+![seeburg circuit](http://phil-lavin.github.io/raspberry-pi-seeburg-wallbox/seeburg-circuit.png)
 
 Compiling
 ---------
