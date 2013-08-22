@@ -1,4 +1,4 @@
-/**
+#/**
 * Code to to decode the pulses from a 1960s Seeburg Wall-O-Matic 100 into the pressed key combination
 * by Phil Lavin <phil@lavin.me.uk>.
 *
@@ -8,7 +8,9 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/time.h>
+#include <string.h>
 #include <wiringPi.h>
 
 // Which GPIO pin we're using
@@ -30,17 +32,30 @@ int pre_gap = 1;
 // Pulse counters
 int pre_gap_pulses = 0;
 int post_gap_pulses = 0;
+// Settings
+char *pass_to = NULL;
 
 // Predefines
 unsigned long get_diff(struct timeval now, struct timeval last_change);
 void handle_gpio_interrupt(void);
 void handle_key_combo(char letter, int number);
 
-int main(void) {
+int main(int argc, char **argv) {
+	int c;
 	struct timeval now;
 	unsigned long diff;
 	char letter;
 	int number;
+
+	// CLI Params
+	while ((c = getopt(argc, argv, "p:")) != -1) {
+		switch (c) {
+			// Programme to pass the generated key combo to for handling
+			case 'p':
+				pass_to = strdup(optarg);
+				break;
+		}
+	}
 
 	// Init
 	wiringPiSetup();
@@ -53,6 +68,8 @@ int main(void) {
 
 	// Bind to interrupt
 	wiringPiISR(PIN, INT_EDGE_BOTH, &handle_gpio_interrupt);
+
+	handle_key_combo('F', 3);
 
 	// The loop...
 	for (;;) {
@@ -96,6 +113,10 @@ int main(void) {
 		usleep(10000);
 	}
 
+	if (pass_to) {
+		free(pass_to);
+	}
+
 	return 0;
 }
 
@@ -131,7 +152,30 @@ void handle_gpio_interrupt(void) {
 
 // Handler for the completed key combination
 void handle_key_combo(char letter, int number) {
-	printf("Combo: %c%d\n\n", letter, number);
+	char combo[3];
+	char *sys_cmd;
+	int system_rtn;
+
+	printf("Combo: %c%d\n", letter, number);
+
+	if (pass_to) {
+		// Make a string representation of our key combo
+		sprintf(combo, "%c%d", letter, number);
+
+		// Concat the supplied command and the key combo
+		sys_cmd = strdup(pass_to);
+		sys_cmd = realloc(sys_cmd, sizeof(sys_cmd) + sizeof(combo)); // Cause we lose a \0 we don't need to add 1 for the space
+		strcat(sys_cmd, " \0");
+		strcat(sys_cmd, combo);
+
+		// Run the command. Return 0 is good.
+		if (!system(sys_cmd)) {
+			printf("Passed key combo through to the specified programme\n");
+		}
+
+		// Can has memory?
+		free(sys_cmd);
+	}
 }
 
 // Returns the time difference, in usec, between two provided struct timevals 
