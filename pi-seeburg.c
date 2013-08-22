@@ -69,8 +69,6 @@ int main(int argc, char **argv) {
 	// Bind to interrupt
 	wiringPiISR(PIN, INT_EDGE_BOTH, &handle_gpio_interrupt);
 
-	handle_key_combo('F', 3);
-
 	// The loop...
 	for (;;) {
 		// Time now
