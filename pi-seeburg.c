@@ -162,7 +162,7 @@ void handle_key_combo(char letter, int number) {
 
 		// Concat the supplied command and the key combo
 		sys_cmd = strdup(pass_to);
-		sys_cmd = realloc(sys_cmd, sizeof(sys_cmd) + sizeof(combo)); // Cause we lose a \0 we don't need to add 1 for the space
+		sys_cmd = realloc(sys_cmd, strlen(sys_cmd) + sizeof(combo)); // Cause we lose a \0 we don't need to add 1 for the space
 		strcat(sys_cmd, " \0");
 		strcat(sys_cmd, combo);
 
@@ -176,7 +176,7 @@ void handle_key_combo(char letter, int number) {
 	}
 }
 
-// Returns the time difference, in usec, between two provided struct timevals 
+// Returns the time difference, in usec, between two provided struct timevals
 unsigned long get_diff(struct timeval now, struct timeval last_change) {
 	return (now.tv_sec * 1000000 + now.tv_usec) - (last_change.tv_sec * 1000000 + last_change.tv_usec);
 }
