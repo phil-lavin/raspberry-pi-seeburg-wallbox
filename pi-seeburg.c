@@ -49,7 +49,6 @@ void handle_gpio_interrupt(void);
 void handle_key_combo(char letter, int number);
 void set_msg(int msg);
 void unset_msg(int msg);
-void send_msg_to_pi();
 
 int main(int argc, char **argv) {
 	int c;
@@ -211,21 +210,34 @@ unsigned long get_diff(struct timeval now, struct timeval last_change) {
 	return (now.tv_sec * 1000000 + now.tv_usec) - (last_change.tv_sec * 1000000 + last_change.tv_usec);
 }
 
-// Adds a bitmask to the msg bitmask
+// Sends a message to the pi - can be a bitmask
 void set_msg(int msg) {
-	msg_bitmask = msg_bitmask | msg;
-
-	send_msg_to_pi();
+	if (msg & 16) {
+		digitalWrite(4, 1);
+	}
+	if (msg & 32) {
+		digitalWrite(5, 1);
+	}
+	if (msg & 64) {
+		digitalWrite(6, 1);
+	}
+	if (msg & 128) {
+		digitalWrite(7, 1);
+	}
 }
 
-// Removes a bitmask from the msg bitmask
+// Removes a message from the pi - can be a bitmask
 void unset_msg(int msg) {
-	msg_bitmask = msg_bitmask & ~msg;
-
-	send_msg_to_pi();
-}
-
-// Sends the bitmask to the pi
-void send_msg_to_pi() {
-	digitalWriteByte(msg_bitmask);
+	if (msg & 16) {
+		digitalWrite(4, 0);
+	}
+	if (msg & 32) {
+		digitalWrite(5, 0);
+	}
+	if (msg & 64) {
+		digitalWrite(6, 0);
+	}
+	if (msg & 128) {
+		digitalWrite(7, 0);
+	}
 }
