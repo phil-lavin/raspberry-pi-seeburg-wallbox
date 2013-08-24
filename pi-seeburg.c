@@ -20,7 +20,7 @@
 #define MSG_GOT_PULSE 16
 #define MSG_PROG_DIDNT_RETURN_0 32
 #define MSG_TRACK_NOT_FOUND 64
-#define MSG_RESERVED_FOR_FUTURE 128
+#define MSG_SONOS_NOT_FOUND 128
 
 // How much time a change must be since the last in order to count as a change
 #define IGNORE_CHANGE_BELOW_USEC 10000
