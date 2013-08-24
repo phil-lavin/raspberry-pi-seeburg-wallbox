@@ -154,8 +154,6 @@ void handle_gpio_interrupt(void) {
 
 	// Filter jitter
 	if (diff > IGNORE_CHANGE_BELOW_USEC) {
-		printf("Pulse!!");
-
 		// Got a pulse msg
 		set_msg(MSG_GOT_PULSE);
 
