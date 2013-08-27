@@ -59,6 +59,7 @@ int main(int argc, char **argv) {
 	unsigned long diff;
 	char letter;
 	int number;
+	int pre, post;
 
 	// CLI Params
 	while ((c = getopt(argc, argv, "dp:")) != -1) {
@@ -104,21 +105,24 @@ int main(int argc, char **argv) {
 		if (diff > MIN_TRAIN_BOUNDARY_USEC) {
 			// Have we registered a full pulse train (i.e. seen a gap)?
 			if (!pre_gap && pre_gap_pulses && post_gap_pulses) {
+				// 0 base the counts without changing the originals
+				pre = pre_gap_pulses - 1;
+				post = post_gap_pulses - 1;
+
 				if (debug)
 					printf("Locking\n");
 
 				lock = 1;
 
-				if (debug)
+				if (debug) {
 					printf("Locked\n");
-
-				if (debug)
-					printf("Before calc. Pre: %d Post: %d\n", pre_gap_pulses - 1, post_gap_pulses - 1);
+					printf("Before calc. Pre: %d Post: %d\n", pre, post);
+				}
 
 				// Calc the key combination...
-				letter = 'A' + (2 * (post_gap_pulses - 1)) + ((pre_gap_pulses - 1) > 10); // A plus the offset plus 1 more if pre gap pulses > 10
+				letter = 'A' + (2 * post) + (pre > 10); // A plus the offset plus 1 more if pre gap pulses > 10
 				letter += (letter > 'H'); // Hax for missing I
-				number = (pre_gap_pulses - 1) % 10;
+				number = pre % 10;
 
 				// Hand off to the handler
 				handle_key_combo(letter, number);
