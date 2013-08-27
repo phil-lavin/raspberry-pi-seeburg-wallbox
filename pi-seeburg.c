@@ -35,6 +35,8 @@ int post_gap_pulses = 0;
 // Settings
 char *pass_to = NULL;
 int debug = 0;
+// Locked?
+int lock = 0;
 // Predefines
 unsigned long get_diff(struct timeval now, struct timeval last_change);
 void handle_gpio_interrupt(void);
@@ -83,18 +85,22 @@ int main(int argc, char **argv) {
 		// Should reset counters?
 		if (diff > MIN_TRAIN_BOUNDARY_USEC) {
 			// Have we registered a full pulse train (i.e. seen a gap)?
-			if (!pre_gap) {
-				// 0 base the counts
-				pre_gap_pulses--;
-				post_gap_pulses--;
+			if (!pre_gap && pre_gap_pulses && post_gap_pulses) {
+				if (debug)
+					printf("Locking\n");
+
+				lock = 1;
 
 				if (debug)
-					printf("Before calc. Pre: %d Post: %d\n", pre_gap_pulses, post_gap_pulses);
+					printf("Locked\n");
+
+				if (debug)
+					printf("Before calc. Pre: %d Post: %d\n", pre_gap_pulses - 1, post_gap_pulses - 1);
 
 				// Calc the key combination...
-				letter = 'A' + (2 * post_gap_pulses) + (pre_gap_pulses > 10); // A plus the offset plus 1 more if pre gap pulses > 10
+				letter = 'A' + (2 * (post_gap_pulses - 1)) + ((pre_gap_pulses - 1) > 10); // A plus the offset plus 1 more if pre gap pulses > 10
 				letter += (letter > 'H'); // Hax for missing I
-				number = pre_gap_pulses % 10;
+				number = (pre_gap_pulses - 1) % 10;
 
 				// Hand off to the handler
 				handle_key_combo(letter, number);
@@ -103,16 +109,29 @@ int main(int argc, char **argv) {
 			// Reset counters
 			if (pre_gap_pulses || post_gap_pulses) {
 				if (debug)
-					printf("Reset!\n");
+					printf("Reset! %lu\n", diff);
 
 				pre_gap_pulses = 0;
 				post_gap_pulses = 0;
 				pre_gap = 1;
 			}
+
+			if (lock) {
+				if (debug)
+					printf("Unlocking\n");
+
+				lock = 0;
+
+				if (debug)
+					printf("Unlocked\n");
+			}
 		}
 
 		// Should update time to stop diff overflowing?
 		if (diff > OVERFLOW_PROTECTION_INTERVAL_USEC) {
+			if (debug)
+				printf("Overflow protection\n");
+
 			gettimeofday(&last_change, NULL);
 		}
 
@@ -132,32 +151,37 @@ void handle_gpio_interrupt(void) {
 	struct timeval now;
 	unsigned long diff;
 
-	gettimeofday(&now, NULL);
+	if (!lock) {
+		gettimeofday(&now, NULL);
 
-	// Time difference in usec
-	diff = get_diff(now, last_change);
+		// Time difference in usec
+		diff = get_diff(now, last_change);
 
-	// Filter jitter
-	if (diff > IGNORE_CHANGE_BELOW_USEC) {
-		// Should switch to post gap? It's a gap > gap len but less than train boundary. Only when we're doing numbers, though.
-		if (pre_gap && diff > MIN_GAP_LEN_USEC && diff < MIN_TRAIN_BOUNDARY_USEC) {
-			pre_gap = 0;
+		// Filter jitter
+		if (diff > IGNORE_CHANGE_BELOW_USEC) {
+			// Should switch to post gap? It's a gap > gap len but less than train boundary. Only when we're doing numbers, though.
+			if (pre_gap && diff > MIN_GAP_LEN_USEC && diff < MIN_TRAIN_BOUNDARY_USEC) {
+				pre_gap = 0;
+			}
+
+			// Increment the right counter
+			if (pre_gap) {
+				pre_gap_pulses++;
+			}
+			else {
+				post_gap_pulses++;
+			}
+
+			if (debug)
+				printf("Pulse! Pre: %d Post: %d Diff: %lu\n", pre_gap_pulses, post_gap_pulses, diff);
 		}
 
-		// Increment the right counter
-		if (pre_gap) {
-			pre_gap_pulses++;
-		}
-		else {
-			post_gap_pulses++;
-		}
-
-		if (debug)
-			printf("Pulse! Pre: %d Post: %d Diff: %lu\n", pre_gap_pulses, post_gap_pulses, diff);
+		// Record when the last change was
+		last_change = now;
 	}
-
-	// Record when the last change was
-	last_change = now;
+	else {
+		printf("Locked. Ignoring interrupt\n");
+	}
 }
 
 // Handler for the completed key combination
