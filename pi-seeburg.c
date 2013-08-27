@@ -34,7 +34,7 @@ int pre_gap_pulses = 0;
 int post_gap_pulses = 0;
 // Settings
 char *pass_to = NULL;
-
+int debug = 0;
 // Predefines
 unsigned long get_diff(struct timeval now, struct timeval last_change);
 void handle_gpio_interrupt(void);
@@ -48,8 +48,11 @@ int main(int argc, char **argv) {
 	int number;
 
 	// CLI Params
-	while ((c = getopt(argc, argv, "p:")) != -1) {
+	while ((c = getopt(argc, argv, "dp:")) != -1) {
 		switch (c) {
+			case 'd':
+				debug = 1;
+				break;
 			// Programme to pass the generated key combo to for handling
 			case 'p':
 				pass_to = strdup(optarg);
@@ -85,6 +88,9 @@ int main(int argc, char **argv) {
 				pre_gap_pulses--;
 				post_gap_pulses--;
 
+				if (debug)
+					printf("Before calc. Pre: %d Post: %d\n", pre_gap_pulses, post_gap_pulses);
+
 				// Calc the key combination...
 				letter = 'A' + (2 * post_gap_pulses) + (pre_gap_pulses > 10); // A plus the offset plus 1 more if pre gap pulses > 10
 				letter += (letter > 'H'); // Hax for missing I
@@ -96,6 +102,9 @@ int main(int argc, char **argv) {
 
 			// Reset counters
 			if (pre_gap_pulses || post_gap_pulses) {
+				if (debug)
+					printf("Reset!\n");
+
 				pre_gap_pulses = 0;
 				post_gap_pulses = 0;
 				pre_gap = 1;
@@ -142,6 +151,9 @@ void handle_gpio_interrupt(void) {
 		else {
 			post_gap_pulses++;
 		}
+
+		if (debug)
+			printf("Pulse! Pre: %d Post: %d Diff: %lu\n", pre_gap_pulses, post_gap_pulses, diff);
 	}
 
 	// Record when the last change was
