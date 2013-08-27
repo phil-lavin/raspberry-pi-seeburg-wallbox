@@ -37,6 +37,7 @@ char *pass_to = NULL;
 int debug = 0;
 // Locked?
 int lock = 0;
+
 // Predefines
 unsigned long get_diff(struct timeval now, struct timeval last_change);
 void handle_gpio_interrupt(void);
