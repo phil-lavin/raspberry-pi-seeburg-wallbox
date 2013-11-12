@@ -27,7 +27,7 @@
 // What is the minimum time since the last pulse for a pulse to count as "after the gap"
 #define MIN_GAP_LEN_USEC 250000
 // What is the mimimum time since the last pulse for a pulse to count as a new train
-#define MIN_TRAIN_BOUNDARY_USEC 400000 // 0.4 sec
+#define MIN_TRAIN_BOUNDARY_USEC 370000 // 0.37 sec
 // How often to update the last change value to stop diff overflowing
 #define OVERFLOW_PROTECTION_INTERVAL_USEC 60000000 // 60 secs
 
